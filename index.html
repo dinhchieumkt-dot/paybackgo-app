@@ -2024,7 +2024,7 @@
                                     </span>
                                   ) : item.status === 'CANCELLED' ? (
                                     <span className="px-2 py-1 bg-rose-100 text-rose-800 rounded-md font-bold text-[10px] inline-flex items-center gap-1">
-                                      <i className="fa-solid fa-xmark-circle"></i> Đã hủy
+                                      <i className="fa-solid fa-xmark-circle"></i> Đã huỷ
                                     </span>
                                   ) : (
                                     <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-md font-bold text-[10px] inline-flex items-center gap-1">
@@ -2371,7 +2371,7 @@
                     <div>
                       <span className="text-slate-400 block font-bold">Trạng thái:</span>
                       <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-black mt-0.5 ${selectedOrderTracking.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' : selectedOrderTracking.status === 'CANCELLED' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}`}>
-                        {selectedOrderTracking.status === 'APPROVED' ? 'Đã duyệt' : selectedOrderTracking.status === 'CANCELLED' ? 'Đã hủy' : 'Chờ đối soát'}
+                        {selectedOrderTracking.status === 'APPROVED' ? 'Đã duyệt' : selectedOrderTracking.status === 'CANCELLED' ? 'Đã huỷ' : 'Chờ đối soát'}
                       </span>
                     </div>
                     <div>
@@ -2693,7 +2693,7 @@
                   </div>
 
                   <div className="sm:col-span-2 pt-2 border-t border-slate-100 flex gap-2">
-                    <button type="button" onClick={() => setCampaignFormModal(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">Hủy</button>
+                    <button type="button" onClick={() => setCampaignFormModal(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">Huỷ</button>
                     <button type="submit" disabled={campaignFormSubmitting} className="flex-1 py-2.5 gradient-blue text-white rounded-xl font-black shadow transition disabled:opacity-60 flex items-center justify-center gap-2">
                       {campaignFormSubmitting && <i className="fa-solid fa-spinner fa-spin"></i>}
                       <span>{campaignFormModal.mode === 'create' ? 'Thêm chiến dịch' : 'Lưu thay đổi'}</span>
@@ -2766,7 +2766,7 @@
                   </div>
 
                   <div className="sm:col-span-2 pt-2 border-t border-slate-100 flex gap-2">
-                    <button type="button" onClick={() => setProductFormModal(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">Hủy</button>
+                    <button type="button" onClick={() => setProductFormModal(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">Huỷ</button>
                     <button type="submit" disabled={productFormSubmitting} className="flex-1 py-2.5 gradient-blue text-white rounded-xl font-black shadow transition disabled:opacity-60 flex items-center justify-center gap-2">
                       {productFormSubmitting && <i className="fa-solid fa-spinner fa-spin"></i>}
                       <span>{productFormModal.mode === 'create' ? 'Thêm sản phẩm' : 'Lưu thay đổi'}</span>
@@ -2833,7 +2833,7 @@
                   </div>
 
                   <div className="sm:col-span-2 pt-2 border-t border-slate-100 flex gap-2">
-                    <button type="button" onClick={() => setTaskFormModal(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">Hủy</button>
+                    <button type="button" onClick={() => setTaskFormModal(null)} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">Huỷ</button>
                     <button type="submit" disabled={taskFormSubmitting} className="flex-1 py-2.5 gradient-blue text-white rounded-xl font-black shadow transition disabled:opacity-60 flex items-center justify-center gap-2">
                       {taskFormSubmitting && <i className="fa-solid fa-spinner fa-spin"></i>}
                       <span>Lưu thay đổi</span>
