@@ -1,0 +1,27 @@
+{
+  "name": "Paybackgo - Hoàn Tiền Shopee & Tiếp Thị Liên Kết",
+  "short_name": "Paybackgo",
+  "description": "Nền tảng hoàn tiền Shopee & tiếp thị liên kết Accesstrade - theo dõi ví, nhiệm vụ, hoa hồng CTV.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F8FAFC",
+  "theme_color": "#2563EB",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

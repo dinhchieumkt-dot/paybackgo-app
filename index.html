@@ -2,8 +2,31 @@
 <html lang="vi" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>PaybackGo - Nền Tảng Hoàn Tiền Shopee & Tiếp Thị Liên Kết Accesstrade</title>
+
+  <!-- ============================================================ -->
+  <!-- PWA: cài đặt app (Android/PC dùng manifest, iOS dùng meta tag riêng) -->
+  <!-- ============================================================ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563EB">
+
+  <!-- Android / Chrome / PC: tên hiển thị & icon lấy từ manifest.json -->
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="icons/favicon-32x32.png">
+
+  <!-- iOS (Safari) KHÔNG đọc manifest.json cho icon/tên -> phải khai báo riêng -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Paybackgo">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180x180.png">
+
+  <!-- Windows/Edge pin-to-taskbar dùng chung theme-color + icon ở trên, không cần thẻ riêng -->
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 6 Icons -->
@@ -66,6 +89,85 @@
     }
     input[type=number]::-webkit-inner-spin-button {
       opacity: 1;
+    }
+
+    /* ============================================================
+       PWA + RESPONSIVE (MỤC B)
+       Toàn bộ layout chính đã dùng Tailwind (sm:/md:/lg: ...) nên đã
+       responsive sẵn. Khối dưới đây chỉ BỔ SUNG các phần Tailwind
+       không tự lo được: an toàn notch iOS khi mở app từ màn hình
+       chính (standalone), chống tràn ngang, vùng chạm đủ lớn trên
+       mobile, và giới hạn/co giãn cỡ chữ ở 2 đầu màn hình rất nhỏ
+       hoặc rất lớn.
+       ============================================================ */
+
+    /* Không cho toàn trang cuộn ngang dù có phần tử nào bị tràn */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    img, svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Khi cài thành App (standalone) trên iPhone có tai thỏ/Dynamic
+       Island: chừa khoảng an toàn 2 bên và dưới cùng, tránh nút bị
+       che bởi thanh cử chỉ / notch. Chỉ áp dụng khi chạy như app
+       (display-mode: standalone), không ảnh hưởng khi mở bằng trình
+       duyệt bình thường. */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+    }
+    @media all and (display-mode: standalone) {
+      body {
+        padding-top: env(safe-area-inset-top);
+      }
+      /* Thanh điều hướng dưới cùng trên mobile: cộng thêm khoảng an
+         toàn để không bị thanh cử chỉ của iPhone che mất. Đổi
+         `.mobile-bottom-nav` thành đúng class/khối bạn dùng cho
+         thanh nav dưới cùng nếu tên khác. */
+      .mobile-bottom-nav {
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+      }
+    }
+
+    /* -------- Mobile: ≤ 640px (điện thoại) -------- */
+    @media (max-width: 640px) {
+      body {
+        font-size: 15px;
+      }
+      /* Vùng chạm tối thiểu 44x44px theo chuẩn Apple/Google HIG cho
+         mọi nút bấm và link trên mobile, để ngón tay bấm không nhầm */
+      button, a[role="button"], .btn, input[type="submit"] {
+        min-height: 44px;
+      }
+      /* Khoảng cách các khối nội dung thoáng hơn trên màn hình hẹp */
+      .quest-card-glow, .rounded-3xl, .rounded-2xl {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+
+    /* -------- Tablet: 641px – 1024px -------- */
+    @media (min-width: 641px) and (max-width: 1024px) {
+      body {
+        font-size: 15.5px;
+      }
+    }
+
+    /* -------- Desktop lớn: ≥ 1536px -------- */
+    /* Tailwind đã giới hạn nội dung ở max-w-7xl (~1280px) và canh
+       giữa (mx-auto) nên trên màn hình rất rộng nội dung không bị
+       kéo giãn/vỡ chữ - khối này chỉ nới cỡ chữ cơ bản một chút cho
+       dễ đọc trên màn hình lớn, không đổi bố cục. */
+    @media (min-width: 1536px) {
+      body {
+        font-size: 16.5px;
+      }
     }
   </style>
 
@@ -2614,7 +2716,7 @@
             </div>
           </footer>
 
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 flex items-center justify-around shadow-2xl">
+          <div className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 flex items-center justify-around shadow-2xl">
             <button
               onClick={() => setCurrentTab('trang_chu')}
               className={`flex flex-col items-center gap-1 ${currentTab === 'trang_chu' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
