@@ -1152,7 +1152,7 @@
               </div>
             </aside>
 
-            <main className="flex-1 p-4 lg:p-6 space-y-6 overflow-x-hidden">
+            <main className="flex-1 min-w-0 p-4 lg:p-6 space-y-6 overflow-x-hidden">
 
               {currentTab === 'trang_chu' && (
                 <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
@@ -1256,8 +1256,8 @@
                           {analyzedProduct.product_image && (
                             <img src={analyzedProduct.product_image} alt={analyzedProduct.product_title} className="w-16 h-16 rounded-xl object-cover border border-slate-700 shrink-0" />
                           )}
-                          <div className="space-y-1">
-                            <h4 className="font-bold text-xs sm:text-sm text-white line-clamp-2">{analyzedProduct.product_title}</h4>
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <h4 className="font-bold text-xs sm:text-sm text-white line-clamp-2 break-words">{analyzedProduct.product_title}</h4>
                             {analyzedProduct.price_confirmed ? (
                               <span className="text-sm font-black text-blue-400 block">{analyzedProduct.price_display}</span>
                             ) : (
@@ -1318,8 +1318,8 @@
 
                       <div className="flex items-start gap-3.5">
                         <img src={products[0].image_url} alt={products[0].title} className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shrink-0" />
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-xs sm:text-sm text-slate-900 line-clamp-2">{products[0].title}</h4>
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <h4 className="font-bold text-xs sm:text-sm text-slate-900 line-clamp-2 break-words">{products[0].title}</h4>
                           <span className="text-base font-black text-blue-600 block">{products[0].price_display}</span>
                           {products[0].brand && <p className="text-[11px] text-slate-500 font-semibold">{products[0].brand}</p>}
                         </div>
