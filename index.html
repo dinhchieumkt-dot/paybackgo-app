@@ -892,7 +892,7 @@
       // ==========================================================================
       if (!authChecked) {
         return (
-          <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+          <div className="min-h-dvh flex items-center justify-center bg-[#F8FAFC]">
             <div className="w-12 h-12 rounded-2xl gradient-blue flex items-center justify-center text-white text-xl animate-pulse">
               <i className="fa-solid fa-bolt"></i>
             </div>
@@ -902,7 +902,7 @@
 
       if (!currentUser) {
         return (
-          <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-4">
+          <div className="min-h-dvh flex items-center justify-center bg-[#F8FAFC] p-4">
             {toastMessage && (
               <div className="fixed top-5 right-5 z-[9999] bg-slate-950 text-white px-5 py-3 rounded-2xl shadow-2xl border border-blue-500/50 flex items-center gap-3">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping"></span>
@@ -1031,7 +1031,7 @@
       // ỨNG DỤNG CHÍNH (SAU KHI ĐĂNG NHẬP THẬT)
       // ==========================================================================
       return (
-        <div className="min-h-screen flex flex-col relative bg-[#F8FAFC]">
+        <div className="min-h-dvh flex flex-col relative bg-[#F8FAFC]">
 
           {toastMessage && (
             <div className="fixed top-5 right-5 z-[9999] bg-slate-950 text-white px-5 py-3 rounded-2xl shadow-2xl border border-blue-500/50 flex items-center gap-3 animate-bounce-slow">
@@ -2892,7 +2892,7 @@
             </div>
           </footer>
 
-          <div className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 flex items-center justify-around shadow-2xl">
+          <div className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 flex items-center justify-around shadow-2xl will-change-transform [transform:translateZ(0)]">
             <button
               onClick={() => setCurrentTab('trang_chu')}
               className={`flex flex-col items-center gap-1 ${currentTab === 'trang_chu' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
