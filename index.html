@@ -471,6 +471,81 @@
         }
       };
 
+      const [userBanks, setUserBanks] = useState(null);
+      const [userBanksLoading, setUserBanksLoading] = useState(false);
+      const loadUserBanks = async () => {
+        setUserBanksLoading(true);
+        try {
+          const data = await apiFetch('/api/v1/user/banks');
+          setUserBanks(data);
+        } catch (err) {
+          setUserBanks([]);
+        } finally {
+          setUserBanksLoading(false);
+        }
+      };
+
+      const [newUserBankForm, setNewUserBankForm] = useState({ bank_name: '', account_number: '', account_name: '' });
+      const [addUserBankSubmitting, setAddUserBankSubmitting] = useState(false);
+
+      const submitAddUserBank = async (e) => {
+        e.preventDefault();
+        if (!newUserBankForm.bank_name) {
+          showToast('Vui lòng chọn ngân hàng / ví!');
+          return;
+        }
+        if (!/^[0-9]{6,19}$/.test(newUserBankForm.account_number)) {
+          showToast('Số tài khoản không hợp lệ (chỉ gồm 6-19 chữ số).');
+          return;
+        }
+        if (!/^[A-Z\s]{2,60}$/.test(newUserBankForm.account_name)) {
+          showToast('Tên chủ tài khoản không hợp lệ (chỉ gồm chữ cái in hoa không dấu và khoảng trắng).');
+          return;
+        }
+        setAddUserBankSubmitting(true);
+        try {
+          await apiFetch('/api/v1/user/banks', {
+            method: 'POST',
+            body: {
+              bank_name: newUserBankForm.bank_name,
+              account_number: newUserBankForm.account_number.trim(),
+              account_name: newUserBankForm.account_name.trim().toUpperCase(),
+            },
+          });
+          showToast('✅ Đã lưu tài khoản ngân hàng!');
+          setNewUserBankForm({ bank_name: '', account_number: '', account_name: '' });
+          loadUserBanks();
+        } catch (err) {
+          showToast(err.message || 'Lưu tài khoản thất bại.');
+        } finally {
+          setAddUserBankSubmitting(false);
+        }
+      };
+
+      const setDefaultUserBank = async (bank) => {
+        try {
+          await apiFetch(`/api/v1/user/banks/${bank.id}/default`, { method: 'PATCH' });
+          loadUserBanks();
+        } catch (err) {
+          showToast(err.message || 'Không đặt được mặc định.');
+        }
+      };
+
+      const deleteUserBank = async (bank) => {
+        try {
+          await apiFetch(`/api/v1/user/banks/${bank.id}`, { method: 'DELETE' });
+          loadUserBanks();
+        } catch (err) {
+          showToast(err.message || 'Không xoá được tài khoản.');
+        }
+      };
+
+      useEffect(() => {
+        if (currentTab === 'vi_tien' && userBanks === null) {
+          loadUserBanks();
+        }
+      }, [currentTab]);
+
       // ---- CHUỖI TIẾN CẤP 10 TRIỆU (THẬT) ----
       const [tasks, setTasks] = useState(null);
       const [tasksLoading, setTasksLoading] = useState(false);
@@ -781,13 +856,15 @@
           setWithdrawForm((f) => ({ ...f, bank_name: shortName }));
         } else if (bankPickerTarget === 'admin') {
           setAddBankForm((f) => ({ ...f, bank_name: shortName }));
+        } else if (bankPickerTarget === 'user_bank') {
+          setNewUserBankForm((f) => ({ ...f, bank_name: shortName }));
         }
         setBankPickerTarget(null);
       };
 
       const filteredVnBanks = useMemo(() => {
         if (!vnBankList) return [];
-        const list = bankPickerTarget === 'withdraw' ? [...VN_EWALLETS, ...vnBankList] : vnBankList;
+        const list = (bankPickerTarget === 'withdraw' || bankPickerTarget === 'user_bank') ? [...VN_EWALLETS, ...vnBankList] : vnBankList;
         const q = bankPickerSearch.trim().toLowerCase();
         if (!q) return list;
         return list.filter((b) =>
