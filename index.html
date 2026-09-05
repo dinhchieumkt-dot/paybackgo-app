@@ -416,6 +416,7 @@
       }, [currentUser && currentUser.id]);
 
       const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+      const [showAccountMenu, setShowAccountMenu] = useState(false);
       const [withdrawForm, setWithdrawForm] = useState({ bank_name: 'Vietcombank', account_number: '', account_name: '', amount: '' });
       const [withdrawSubmitting, setWithdrawSubmitting] = useState(false);
 
@@ -668,6 +669,10 @@
 
       const submitAddBank = async (e) => {
         e.preventDefault();
+        if (!addBankForm.bank_name) {
+          showToast('Vui lòng chọn ngân hàng.');
+          return;
+        }
         setAddBankSubmitting(true);
         try {
           await apiFetch('/api/v1/admin/banks', {
@@ -709,6 +714,71 @@
           showToast(err.message || 'Xoá tài khoản thất bại.');
         }
       };
+
+      // ---- CHỌN NGÂN HÀNG: danh sách đầy đủ ngân hàng VN kèm logo (VietQR API công khai) ----
+      const FALLBACK_VN_BANKS = [
+        { shortName: 'Vietcombank', name: 'Ngân hàng TMCP Ngoại Thương Việt Nam', code: 'VCB', logo: 'https://cdn.vietqr.io/img/VCB.png' },
+        { shortName: 'VietinBank', name: 'Ngân hàng TMCP Công thương Việt Nam', code: 'ICB', logo: 'https://cdn.vietqr.io/img/ICB.png' },
+        { shortName: 'BIDV', name: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam', code: 'BIDV', logo: 'https://cdn.vietqr.io/img/BIDV.png' },
+        { shortName: 'Agribank', name: 'Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam', code: 'VBA', logo: 'https://cdn.vietqr.io/img/VBA.png' },
+        { shortName: 'MB Bank', name: 'Ngân hàng TMCP Quân đội', code: 'MB', logo: 'https://cdn.vietqr.io/img/MB.png' },
+        { shortName: 'Techcombank', name: 'Ngân hàng TMCP Kỹ Thương Việt Nam', code: 'TCB', logo: 'https://cdn.vietqr.io/img/TCB.png' },
+        { shortName: 'ACB', name: 'Ngân hàng TMCP Á Châu', code: 'ACB', logo: 'https://cdn.vietqr.io/img/ACB.png' },
+        { shortName: 'VPBank', name: 'Ngân hàng TMCP Việt Nam Thịnh Vượng', code: 'VPB', logo: 'https://cdn.vietqr.io/img/VPB.png' },
+        { shortName: 'Sacombank', name: 'Ngân hàng TMCP Sài Gòn Thương Tín', code: 'STB', logo: 'https://cdn.vietqr.io/img/STB.png' },
+        { shortName: 'TPBank', name: 'Ngân hàng TMCP Tiên Phong', code: 'TPB', logo: 'https://cdn.vietqr.io/img/TPB.png' },
+      ];
+      const VN_EWALLETS = [
+        { shortName: 'Ví MoMo', name: 'Ví điện tử MoMo', code: 'MOMO', logo: null },
+        { shortName: 'ZaloPay', name: 'Ví điện tử ZaloPay', code: 'ZALOPAY', logo: null },
+        { shortName: 'ViettelPay', name: 'Ví điện tử ViettelPay/Viettel Money', code: 'VIETTELPAY', logo: null },
+      ];
+      const [vnBankList, setVnBankList] = useState(null);
+      const [vnBankListLoading, setVnBankListLoading] = useState(false);
+      const [bankPickerTarget, setBankPickerTarget] = useState(null); // 'withdraw' | 'admin' | null
+      const [bankPickerSearch, setBankPickerSearch] = useState('');
+
+      const loadVnBankList = async () => {
+        if (vnBankList) return;
+        setVnBankListLoading(true);
+        try {
+          const res = await fetch('https://api.vietqr.io/v2/banks');
+          const json = await res.json();
+          const banks = (json && Array.isArray(json.data) && json.data.length > 0) ? json.data : FALLBACK_VN_BANKS;
+          setVnBankList(banks);
+        } catch (err) {
+          setVnBankList(FALLBACK_VN_BANKS);
+        } finally {
+          setVnBankListLoading(false);
+        }
+      };
+
+      const openBankPicker = (target) => {
+        setBankPickerTarget(target);
+        setBankPickerSearch('');
+        loadVnBankList();
+      };
+
+      const selectVnBank = (shortName) => {
+        if (bankPickerTarget === 'withdraw') {
+          setWithdrawForm((f) => ({ ...f, bank_name: shortName }));
+        } else if (bankPickerTarget === 'admin') {
+          setAddBankForm((f) => ({ ...f, bank_name: shortName }));
+        }
+        setBankPickerTarget(null);
+      };
+
+      const filteredVnBanks = useMemo(() => {
+        if (!vnBankList) return [];
+        const list = bankPickerTarget === 'withdraw' ? [...VN_EWALLETS, ...vnBankList] : vnBankList;
+        const q = bankPickerSearch.trim().toLowerCase();
+        if (!q) return list;
+        return list.filter((b) =>
+          (b.shortName || '').toLowerCase().includes(q) ||
+          (b.name || '').toLowerCase().includes(q) ||
+          (b.code || '').toLowerCase().includes(q)
+        );
+      }, [vnBankList, bankPickerSearch, bankPickerTarget]);
 
       // ---- ADMIN: QUẢN LÝ CHIẾN DỊCH ACCESSTRADE ----
       const emptyCampaignForm = {
@@ -1044,39 +1114,65 @@
           )}
 
           <header className="bg-slate-950 text-white px-4 py-2 text-xs font-medium sticky top-0 z-40 border-b border-slate-800 shadow-sm">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-              <div className="flex items-center gap-2 flex-wrap justify-center">
-                <span className="gradient-blue text-white px-2.5 py-0.5 rounded-full font-black text-[11px]">
-                  {currentUser.role === 'ADMIN' ? '🛡️ MASTER ADMIN' : '👑 THÀNH VIÊN'}
-                </span>
-                <span className="text-slate-300">Xin chào: <strong className="font-mono text-blue-400">{currentUser.display_name || currentUser.username}</strong></span>
-                <button
-                  onClick={() => copyToClipboard(currentUser.referral_code, 'Đã copy mã giới thiệu của bạn!')}
-                  className="bg-white/10 hover:bg-white/20 text-blue-300 px-2.5 py-0.5 rounded-md transition text-xs font-bold inline-flex items-center gap-1"
-                >
-                  <i className="fa-regular fa-copy"></i> Mã Giới Thiệu: {currentUser.referral_code}
-                </button>
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg gradient-blue flex items-center justify-center text-white font-black text-sm shrink-0">
+                  <i className="fa-solid fa-bolt"></i>
+                </div>
+                <span className="font-black text-sm tracking-tight text-white">PaybackGo</span>
               </div>
 
-              <div className="flex items-center gap-3 text-xs">
-                <span className="text-slate-400 hidden md:inline">Cơ chế: <strong className="text-blue-400">30% Hoàn • 10% Giới Thiệu</strong></span>
-                <span className="text-slate-600 hidden md:inline">|</span>
-                <div className="flex items-center gap-2">
-                  {currentUser.role === 'ADMIN' && (
-                    <button
-                      onClick={() => setCurrentTab('admin_portal')}
-                      className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg font-black transition flex items-center gap-1.5 shadow"
-                    >
-                      <i className="fa-solid fa-scale-balanced"></i> Trung Tâm Đối Soát
-                    </button>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition"
-                  >
-                    <i className="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
-                  </button>
-                </div>
+              <div className="relative">
+                <button
+                  onClick={() => setShowAccountMenu((v) => !v)}
+                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 pl-2 pr-3 py-1.5 rounded-full transition"
+                >
+                  <span className="w-6 h-6 rounded-full gradient-blue flex items-center justify-center text-[10px] font-black text-white shrink-0">
+                    {(currentUser.display_name || currentUser.username || '?').charAt(0).toUpperCase()}
+                  </span>
+                  <span className="text-xs font-bold text-slate-200 max-w-[120px] truncate hidden sm:inline">
+                    {currentUser.display_name || currentUser.username}
+                  </span>
+                  <i className={`fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform ${showAccountMenu ? 'rotate-180' : ''}`}></i>
+                </button>
+
+                {showAccountMenu && (
+                  <React.Fragment>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowAccountMenu(false)}></div>
+                    <div className="absolute right-0 mt-2 w-72 max-w-[90vw] bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-fade-in">
+                      <div className="p-4 bg-gradient-to-br from-slate-900 to-slate-950 text-white space-y-1.5">
+                        <span className="gradient-blue text-white px-2.5 py-0.5 rounded-full font-black text-[11px] inline-block">
+                          {currentUser.role === 'ADMIN' ? '🛡️ MASTER ADMIN' : '👑 THÀNH VIÊN'}
+                        </span>
+                        <div className="text-sm font-black">{currentUser.display_name || currentUser.username}</div>
+                        <div className="text-[11px] text-slate-400">Cơ chế: <strong className="text-blue-400">30% Hoàn • 10% Giới Thiệu</strong></div>
+                      </div>
+                      <div className="p-3 space-y-2">
+                        <button
+                          onClick={() => copyToClipboard(currentUser.referral_code, 'Đã copy mã giới thiệu của bạn!')}
+                          className="w-full flex items-center justify-between gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-2 rounded-xl transition text-xs font-bold"
+                        >
+                          <span className="flex items-center gap-1.5"><i className="fa-regular fa-copy"></i> Mã Giới Thiệu</span>
+                          <span className="font-mono text-blue-600">{currentUser.referral_code}</span>
+                        </button>
+                        {currentUser.role === 'ADMIN' && (
+                          <button
+                            onClick={() => { setCurrentTab('admin_portal'); setShowAccountMenu(false); }}
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-xl font-black transition flex items-center gap-2 text-xs"
+                          >
+                            <i className="fa-solid fa-scale-balanced"></i> Trung Tâm Đối Soát
+                          </button>
+                        )}
+                        <button
+                          onClick={() => { setShowAccountMenu(false); handleLogout(); }}
+                          className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition"
+                        >
+                          <i className="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
+                        </button>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                )}
               </div>
             </div>
           </header>
@@ -2121,12 +2217,14 @@
                     <form onSubmit={submitAddBank} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end pt-2 border-t border-slate-800">
                       <div className="sm:col-span-3">
                         <label className="text-xs text-slate-400 block mb-1">Tên Ngân Hàng:</label>
-                        <input
-                          type="text" required value={addBankForm.bank_name}
-                          onChange={(e) => setAddBankForm({ ...addBankForm, bank_name: e.target.value })}
-                          placeholder="Vietcombank..."
-                          className="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-blue-400"
-                        />
+                        <button
+                          type="button"
+                          onClick={() => openBankPicker('admin')}
+                          className={`w-full px-3.5 py-2.5 bg-slate-800 border rounded-xl text-xs font-bold text-white focus:outline-none focus:border-blue-400 flex items-center justify-between gap-2 ${addBankForm.bank_name ? 'border-slate-700' : 'border-rose-500/60'}`}
+                        >
+                          <span className={addBankForm.bank_name ? 'text-white truncate' : 'text-slate-500'}>{addBankForm.bank_name || 'Chọn ngân hàng...'}</span>
+                          <i className="fa-solid fa-chevron-down text-slate-500 text-[10px]"></i>
+                        </button>
                       </div>
                       <div className="sm:col-span-3">
                         <label className="text-xs text-slate-400 block mb-1">Số Tài Khoản:</label>
@@ -2437,18 +2535,14 @@
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">Chọn ngân hàng / Ví nhận tiền</label>
-                    <select
-                      value={withdrawForm.bank_name}
-                      onChange={(e) => setWithdrawForm({ ...withdrawForm, bank_name: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500"
+                    <button
+                      type="button"
+                      onClick={() => openBankPicker('withdraw')}
+                      className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 flex items-center justify-between gap-2 ${withdrawForm.bank_name ? 'border-slate-200' : 'border-rose-300'}`}
                     >
-                      <option value="Vietcombank">Vietcombank</option>
-                      <option value="MB Bank">MB Bank</option>
-                      <option value="Techcombank">Techcombank</option>
-                      <option value="VPBank">VPBank</option>
-                      <option value="ACB">ACB</option>
-                      <option value="Ví MoMo">Ví MoMo</option>
-                    </select>
+                      <span className={withdrawForm.bank_name ? 'text-slate-800 truncate' : 'text-slate-400'}>{withdrawForm.bank_name || 'Chọn ngân hàng / ví...'}</span>
+                      <i className="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
+                    </button>
                   </div>
 
                   <div>
@@ -2496,6 +2590,74 @@
                     <span>Xác Nhận Yêu Cầu Rút Tiền</span>
                   </button>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {bankPickerTarget && (
+            <div
+              className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+              onClick={() => setBankPickerTarget(null)}
+            >
+              <div
+                className="bg-white rounded-3xl max-w-md w-full shadow-2xl relative max-h-[85vh] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 p-4 pb-3">
+                  <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                    <i className="fa-solid fa-building-columns text-blue-500"></i> Chọn Ngân Hàng / Ví
+                  </h3>
+                  <button onClick={() => setBankPickerTarget(null)} className="text-slate-400 hover:text-slate-600">
+                    <i className="fa-solid fa-xmark text-lg"></i>
+                  </button>
+                </div>
+                <div className="p-4 pb-2">
+                  <div className="relative">
+                    <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input
+                      type="text"
+                      autoFocus
+                      value={bankPickerSearch}
+                      onChange={(e) => setBankPickerSearch(e.target.value)}
+                      placeholder="Tìm tên ngân hàng..."
+                      className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-1.5">
+                  {vnBankListLoading && (
+                    <div className="py-6 flex items-center justify-center text-slate-400 text-sm">
+                      <i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang tải danh sách...
+                    </div>
+                  )}
+                  {!vnBankListLoading && filteredVnBanks.length === 0 && (
+                    <div className="py-6 text-center text-slate-400 text-xs">Không tìm thấy ngân hàng phù hợp.</div>
+                  )}
+                  {!vnBankListLoading && filteredVnBanks.map((b, idx) => (
+                    <button
+                      key={b.code || b.shortName || idx}
+                      type="button"
+                      onClick={() => selectVnBank(b.shortName)}
+                      className="w-full flex items-center gap-3 p-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 rounded-xl transition text-left"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                        {b.logo ? (
+                          <img
+                            src={b.logo}
+                            alt={b.shortName}
+                            className="w-full h-full object-contain"
+                            onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                          />
+                        ) : null}
+                        <i className={`fa-solid fa-wallet text-slate-400 ${b.logo ? 'hidden' : 'flex'}`}></i>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-slate-800 truncate">{b.shortName}</div>
+                        <div className="text-[11px] text-slate-400 truncate">{b.name}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
