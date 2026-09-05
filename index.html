@@ -1211,23 +1211,16 @@
                     <i className="fa-solid fa-house w-4"></i> Trang chủ
                   </button>
                   <button onClick={() => setCurrentTab('shopee_hub')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'shopee_hub' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
-                    <i className="fa-solid fa-bag-shopping text-blue-500 w-4"></i> Săn Deal Shopee
+                    <i className="fa-solid fa-bolt text-blue-500 w-4"></i> Flash Sale
                     <span className="ml-auto text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-bold">30%</span>
                   </button>
                   <button onClick={() => setCurrentTab('accesstrade_hub')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'accesstrade_hub' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
-                    <i className="fa-solid fa-coins text-indigo-600 w-4"></i> Nhiệm Vụ Accesstrade
+                    <i className="fa-solid fa-coins text-indigo-600 w-4"></i> Nhiệm Vụ
                     <span className="ml-auto text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-black">CPA</span>
                   </button>
                   <button onClick={() => setCurrentTab('gioi_thieu_ctv')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'gioi_thieu_ctv' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                     <i className="fa-solid fa-users text-blue-500 w-4"></i> Giới Thiệu (Nhận 10%)
                     <span className="ml-auto text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-black">10%</span>
-                  </button>
-                  <button onClick={() => setCurrentTab('nhiem_vu')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'nhiem_vu' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
-                    <i className="fa-solid fa-bullseye text-blue-500 w-4"></i> Chuỗi Tiến Cấp 10Tr
-                    <span className="ml-auto text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-black">10M</span>
-                  </button>
-                  <button onClick={() => setCurrentTab('voucher')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'voucher' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
-                    <i className="fa-solid fa-ticket text-blue-500 w-4"></i> Kho Voucher Sàn
                   </button>
                   <button onClick={() => setCurrentTab('vi_tien')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'vi_tien' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                     <i className="fa-solid fa-wallet text-blue-500 w-4"></i> Ví của tôi & Rút tiền
@@ -3066,25 +3059,11 @@
               <span className="text-[10px]">Trang chủ</span>
             </button>
             <button
-              onClick={() => setCurrentTab('shopee_hub')}
-              className={`flex flex-col items-center gap-1 ${currentTab === 'shopee_hub' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
-            >
-              <i className="fa-solid fa-bag-shopping text-base"></i>
-              <span className="text-[10px]">Shopee</span>
-            </button>
-            <button
-              onClick={() => setCurrentTab('accesstrade_hub')}
-              className={`flex flex-col items-center gap-1 ${currentTab === 'accesstrade_hub' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
-            >
-              <i className="fa-solid fa-coins text-base"></i>
-              <span className="text-[10px]">Accesstrade</span>
-            </button>
-            <button
               onClick={() => setCurrentTab('gioi_thieu_ctv')}
               className={`flex flex-col items-center gap-1 ${currentTab === 'gioi_thieu_ctv' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
             >
               <i className="fa-solid fa-users text-base"></i>
-              <span className="text-[10px]">Giới thiệu (10%)</span>
+              <span className="text-[10px]">Giới thiệu</span>
             </button>
             <button
               onClick={() => setCurrentTab('vi_tien')}
@@ -3092,6 +3071,20 @@
             >
               <i className="fa-solid fa-wallet text-base"></i>
               <span className="text-[10px]">Ví & Rút</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('accesstrade_hub')}
+              className={`flex flex-col items-center gap-1 ${currentTab === 'accesstrade_hub' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
+            >
+              <i className="fa-solid fa-coins text-base"></i>
+              <span className="text-[10px]">Nhiệm vụ</span>
+            </button>
+            <button
+              onClick={() => setCurrentTab('shopee_hub')}
+              className={`flex flex-col items-center gap-1 ${currentTab === 'shopee_hub' ? 'text-blue-600 font-bold' : 'text-slate-500'}`}
+            >
+              <i className="fa-solid fa-bolt text-base"></i>
+              <span className="text-[10px]">Flash Sale</span>
             </button>
           </div>
 
