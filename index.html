@@ -680,6 +680,7 @@
       const [adminRecFilter, setAdminRecFilter] = useState('ALL');
       const [adminPlatformFilter, setAdminPlatformFilter] = useState('ALL');
       const [selectedOrderTracking, setSelectedOrderTracking] = useState(null);
+      const [syncingShopee, setSyncingShopee] = useState(false);
 
       const loadAdminReconciliations = async (statusFilter, platformFilter = adminPlatformFilter) => {
         setAdminRecLoading(true);
@@ -742,6 +743,22 @@
           await Promise.all([loadAdminReconciliations(adminRecFilter), loadWallet()]);
         } catch (err) {
           showToast(err.message || 'Duyệt hàng loạt thất bại.');
+        }
+      };
+
+      const handleSyncShopeeConversions = async () => {
+        setSyncingShopee(true);
+        try {
+          const res = await apiFetch('/api/v1/affiliate/shopee/sync-conversions', {
+            method: 'POST',
+            body: { days_back: 3 },
+          });
+          showToast(res.message || `Đã đồng bộ ${res.synced_count} đơn Shopee mới.`);
+          await Promise.all([loadAdminReconciliations(adminRecFilter), loadWallet()]);
+        } catch (err) {
+          showToast(err.message || 'Đồng bộ Shopee thất bại.');
+        } finally {
+          setSyncingShopee(false);
         }
       };
 
@@ -2205,6 +2222,13 @@
                       </div>
 
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={handleSyncShopeeConversions}
+                          disabled={syncingShopee}
+                          className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-black rounded-xl text-xs shadow-lg transition flex items-center gap-1.5 disabled:opacity-50"
+                        >
+                          {syncingShopee ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-rotate"></i>} Đồng Bộ Đơn Shopee
+                        </button>
                         <button
                           onClick={handleAdminBatchApproveAll}
                           className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-black rounded-xl text-xs shadow-lg transition flex items-center gap-1.5"
