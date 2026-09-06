@@ -678,12 +678,16 @@
       const [adminRecs, setAdminRecs] = useState(null);
       const [adminRecLoading, setAdminRecLoading] = useState(false);
       const [adminRecFilter, setAdminRecFilter] = useState('ALL');
+      const [adminPlatformFilter, setAdminPlatformFilter] = useState('ALL');
       const [selectedOrderTracking, setSelectedOrderTracking] = useState(null);
 
-      const loadAdminReconciliations = async (statusFilter) => {
+      const loadAdminReconciliations = async (statusFilter, platformFilter = adminPlatformFilter) => {
         setAdminRecLoading(true);
         try {
-          const qs = statusFilter && statusFilter !== 'ALL' ? ('?status_filter=' + encodeURIComponent(statusFilter)) : '';
+          const params = new URLSearchParams();
+          if (statusFilter && statusFilter !== 'ALL') params.set('status_filter', statusFilter);
+          if (platformFilter && platformFilter !== 'ALL') params.set('platform_filter', platformFilter);
+          const qs = params.toString() ? ('?' + params.toString()) : '';
           const data = await apiFetch('/api/v1/admin/reconciliations' + qs);
           setAdminRecs(data);
         } catch (err) {
@@ -2258,6 +2262,29 @@
                         </button>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase">Lọc theo kênh:</span>
+                      <div className="flex items-center gap-1.5 text-xs font-bold bg-slate-100 p-1 rounded-xl">
+                        <button
+                          onClick={() => { setAdminPlatformFilter('ALL'); loadAdminReconciliations(adminRecFilter, 'ALL'); }}
+                          className={`px-3 py-1.5 rounded-lg transition ${adminPlatformFilter === 'ALL' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}
+                        >
+                          Tất cả kênh
+                        </button>
+                        <button
+                          onClick={() => { setAdminPlatformFilter('SHOPEE'); loadAdminReconciliations(adminRecFilter, 'SHOPEE'); }}
+                          className={`px-3 py-1.5 rounded-lg transition ${adminPlatformFilter === 'SHOPEE' ? 'bg-white text-orange-600 shadow' : 'text-slate-600'}`}
+                        >
+                          Shopee riêng
+                        </button>
+                        <button
+                          onClick={() => { setAdminPlatformFilter('ACCESSTRADE'); loadAdminReconciliations(adminRecFilter, 'ACCESSTRADE'); }}
+                          className={`px-3 py-1.5 rounded-lg transition ${adminPlatformFilter === 'ACCESSTRADE' ? 'bg-white text-purple-600 shadow' : 'text-slate-600'}`}
+                        >
+                          Accesstrade riêng
+                        </button>
+                      </div>
+                    </div>
 
                     {adminRecLoading && !adminRecs && (
                       <div className="py-10 flex items-center justify-center text-slate-400 text-sm">
@@ -2293,8 +2320,8 @@
                               >
                                 <td className="p-3">
                                   <div className="flex items-center gap-2">
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-black ${item.platform === 'Shopee' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'}`}>
-                                      {item.platform}
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-black ${item.platform === 'SHOPEE' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'}`}>
+                                      {item.platform === 'SHOPEE' ? 'Shopee' : 'Accesstrade'}
                                     </span>
                                     <span className="font-mono font-bold text-blue-600 underline">{item.order_id}</span>
                                   </div>
