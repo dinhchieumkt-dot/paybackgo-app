@@ -1476,9 +1476,15 @@
                         </div>
 
                         {analyzedProduct.price_confirmed ? (
-                          <div className="gradient-blue rounded-2xl p-4 text-white flex items-center justify-between shadow-lg">
-                            <div>
-                              <span className="text-[10px] uppercase font-bold text-blue-100 block">Bạn nhận về hoàn tiền (ước tính)</span>
+                          <div className="gradient-blue rounded-2xl p-4 text-white shadow-lg space-y-2">
+                            {analyzedProduct.total_commission_display && (
+                              <div className="flex items-center justify-between border-b border-white/20 pb-2">
+                                <span className="text-[10px] uppercase font-bold text-blue-100">Tổng hoa hồng đơn này</span>
+                                <span className="text-sm font-black text-white">~{analyzedProduct.total_commission_display}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] uppercase font-bold text-blue-100">Bạn nhận</span>
                               <span className="text-xl font-black text-white">~{analyzedProduct.estimated_cashback_display}</span>
                             </div>
                           </div>
