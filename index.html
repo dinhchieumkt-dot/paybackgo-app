@@ -256,6 +256,27 @@
     }
 
     // ==========================================================================
+    // HẠNG THÀNH VIÊN (hiển thị) - khớp với app/routers/affiliate.py::get_rank_details
+    // ==========================================================================
+    const RANK_META = {
+      silver: { icon: '🥈', label: 'Bạc', className: 'bg-slate-200 text-slate-700' },
+      gold: { icon: '🥇', label: 'Vàng', className: 'bg-amber-100 text-amber-700' },
+      diamond: { icon: '💎', label: 'Kim Cương', className: 'bg-cyan-100 text-cyan-700' },
+    };
+    function RankBadge({ wallet, size = 'sm' }) {
+      if (!wallet || !wallet.rank_key) return null;
+      const meta = RANK_META[wallet.rank_key] || RANK_META.silver;
+      const ratePercent = Math.round((wallet.rank_rate || 0) * 100);
+      const sizeClass = size === 'lg' ? 'text-xs px-2.5 py-1' : 'text-[10px] px-1.5 py-0.5';
+      return (
+        <span className={`inline-flex items-center gap-1 rounded-full font-black ${sizeClass} ${meta.className}`}>
+          <span>{meta.icon}</span>
+          <span>Hạng {meta.label} • {ratePercent}%</span>
+        </span>
+      );
+    }
+
+    // ==========================================================================
     // APP
     // ==========================================================================
     function App() {
@@ -1054,6 +1075,104 @@
 
       const [adminCatalogTab, setAdminCatalogTab] = useState('campaigns');
 
+      // ---- BẢNG XẾP HẠNG (PUBLIC - cho mọi user) ----
+      const [leaderboard, setLeaderboard] = useState(null);
+      const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+      const loadLeaderboard = async () => {
+        setLeaderboardLoading(true);
+        try {
+          const data = await apiFetch('/api/v1/leaderboard/top');
+          setLeaderboard(data);
+        } catch (err) {
+          showToast(err.message || 'Không tải được bảng xếp hạng.');
+        } finally {
+          setLeaderboardLoading(false);
+        }
+      };
+
+      // ---- TIPS & TRICKS MODAL ----
+      const [showTipsModal, setShowTipsModal] = useState(false);
+
+      // ---- ORDER CLAIM MODAL (khai báo đơn thủ công) ----
+      const [showOrderClaimModal, setShowOrderClaimModal] = useState(false);
+      const [orderClaimForm, setOrderClaimForm] = useState({ order_code: '', platform: 'shopee', screenshot_url: '', note: '' });
+      const [orderClaimSubmitting, setOrderClaimSubmitting] = useState(false);
+
+      // ---- ADMIN DASHBOARD KPI ----
+      const [dashboardStats, setDashboardStats] = useState(null);
+      const [dashboardStatsLoading, setDashboardStatsLoading] = useState(false);
+      const [adminDashTab, setAdminDashTab] = useState('overview');
+      const [fraudAlerts, setFraudAlerts] = useState(null);
+      const [fraudAlertsLoading, setFraudAlertsLoading] = useState(false);
+      const [adminLeaderboard, setAdminLeaderboard] = useState(null);
+      const [adminLeaderboardLoading, setAdminLeaderboardLoading] = useState(false);
+      const [pendingWithdrawals, setPendingWithdrawals] = useState(null);
+      const [pendingWithdrawalsLoading, setPendingWithdrawalsLoading] = useState(false);
+      const [approvingWdId, setApprovingWdId] = useState(null);
+      const [rejectingWdId, setRejectingWdId] = useState(null);
+
+      const loadDashboardStats = async () => {
+        setDashboardStatsLoading(true);
+        try {
+          const data = await apiFetch('/api/v1/admin/dashboard/stats');
+          setDashboardStats(data);
+        } catch (err) { showToast(err.message || 'Không tải được dashboard.'); }
+        finally { setDashboardStatsLoading(false); }
+      };
+
+      const loadFraudAlerts = async () => {
+        setFraudAlertsLoading(true);
+        try {
+          const data = await apiFetch('/api/v1/admin/dashboard/fraud-alerts');
+          setFraudAlerts(data);
+        } catch (err) { showToast(err.message || 'Không tải được cảnh báo gian lận.'); }
+        finally { setFraudAlertsLoading(false); }
+      };
+
+      const loadAdminLeaderboard = async () => {
+        setAdminLeaderboardLoading(true);
+        try {
+          const data = await apiFetch('/api/v1/admin/dashboard/leaderboard');
+          setAdminLeaderboard(data);
+        } catch (err) { showToast(err.message || 'Không tải được BXH.'); }
+        finally { setAdminLeaderboardLoading(false); }
+      };
+
+      const loadPendingWithdrawals = async () => {
+        setPendingWithdrawalsLoading(true);
+        try {
+          const data = await apiFetch('/api/v1/admin/withdrawals/pending');
+          setPendingWithdrawals(data);
+        } catch (err) { showToast(err.message || 'Không tải được lệnh rút tiền.'); }
+        finally { setPendingWithdrawalsLoading(false); }
+      };
+
+      const handleApproveWithdrawal = async (txId) => {
+        setApprovingWdId(txId);
+        try {
+          const res = await apiFetch('/api/v1/admin/withdrawals/' + txId + '/approve', { method: 'POST' });
+          showToast('✅ ' + res.message);
+          await loadPendingWithdrawals();
+        } catch (err) { showToast(err.message || 'Duyệt thất bại.'); }
+        finally { setApprovingWdId(null); }
+      };
+
+      const handleRejectWithdrawal = async (txId) => {
+        const reason = prompt('Nhập lý do từ chối (tùy chọn):');
+        setRejectingWdId(txId);
+        try {
+          const res = await apiFetch('/api/v1/admin/withdrawals/' + txId + '/reject', {
+            method: 'POST',
+            body: { reason: reason || '' },
+          });
+          showToast('❌ ' + res.message);
+          await loadPendingWithdrawals();
+        } catch (err) { showToast(err.message || 'Từ chối thất bại.'); }
+        finally { setRejectingWdId(null); }
+      };
+
+      const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1XLVN9b-Hmv-Doo40-bdEeDbM41pxfGvI8RDwrOQ0k60/edit';
+
       // ---- Tải dữ liệu theo tab đang mở (lười tải, chỉ tải khi cần) ----
       useEffect(() => {
         if (!currentUser) return;
@@ -1061,12 +1180,15 @@
         if (currentTab === 'accesstrade_hub' && campaigns === null) loadCampaigns();
         if (currentTab === 'nhiem_vu' && tasks === null) loadTasks();
         if (currentTab === 'vi_tien' && wallet === null) loadWallet();
+        if (currentTab === 'bang_xep_hang' && leaderboard === null) loadLeaderboard();
         if (currentTab === 'admin_portal' && currentUser.role === 'ADMIN') {
           if (adminRecs === null) loadAdminReconciliations('ALL');
           if (adminCampaigns === null) loadAdminCampaigns();
           if (adminProducts === null) loadAdminProducts();
           if (adminBanks === null) loadAdminBanks();
           if (adminTasks === null) loadAdminTasks();
+          if (dashboardStats === null) loadDashboardStats();
+          if (pendingWithdrawals === null) loadPendingWithdrawals();
         }
       }, [currentTab, currentUser && currentUser.id]);
 
@@ -1104,7 +1226,7 @@
                 </div>
                 <div>
                   <h1 className="font-black text-xl tracking-tight text-slate-900">PaybackGo</h1>
-                  <p className="text-[11px] text-slate-400 font-semibold">Hoàn 30% • Giới thiệu 10%</p>
+                  <p className="text-[11px] text-slate-400 font-semibold">Hoàn 40-55% • Giới thiệu 10%</p>
                 </div>
               </div>
 
@@ -1209,7 +1331,7 @@
                   </form>
                 )}
               </div>
-              <p className="text-center text-[11px] text-slate-400 mt-5">🔒 Đăng nhập bảo mật JWT • Hoàn 30% • Giới thiệu 10% vĩnh viễn</p>
+              <p className="text-center text-[11px] text-slate-400 mt-5">🔒 Đăng nhập bảo mật JWT • Hoàn 40-55% • Giới thiệu 10% vĩnh viễn</p>
             </div>
           </div>
         );
@@ -1260,7 +1382,7 @@
                           {currentUser.role === 'ADMIN' ? '🛡️ MASTER ADMIN' : '👑 THÀNH VIÊN'}
                         </span>
                         <div className="text-sm font-black">{currentUser.display_name || currentUser.username}</div>
-                        <div className="text-[11px] text-slate-400">Cơ chế: <strong className="text-blue-400">30% Hoàn • 10% Giới Thiệu</strong></div>
+                        <div className="text-[11px] text-slate-400">Cơ chế: <strong className="text-blue-400">40-55% Hoàn • 10% Giới Thiệu</strong></div>
                       </div>
                       <div className="p-3 space-y-2">
                         <button
@@ -1303,7 +1425,7 @@
                   </div>
                   <div>
                     <h1 className="font-black text-lg tracking-tight text-slate-900">PaybackGo</h1>
-                    <p className="text-[11px] text-slate-400 font-semibold">Hoàn 30% • Giới thiệu 10%</p>
+                    <p className="text-[11px] text-slate-400 font-semibold">Hoàn 40-55% • Giới thiệu 10%</p>
                   </div>
                 </div>
 
@@ -1315,6 +1437,16 @@
                   <div className="text-xl font-black text-blue-400 mb-2">
                     {wallet ? wallet.available_display : (walletLoading ? '...' : '—')}
                   </div>
+                  {wallet && wallet.rank_key && (
+                    <div className="mb-2">
+                      <RankBadge wallet={wallet} />
+                      {wallet.next_rank_label && (
+                        <span className="text-[10px] text-slate-400 ml-1.5">
+                          Còn {wallet.orders_to_next_rank} đơn lên hạng {wallet.next_rank_label}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-[11px] text-slate-300 pt-2 border-t border-slate-800">
                     <span>Chờ duyệt: <strong>{wallet ? wallet.pending_display : '—'}</strong></span>
                     <button onClick={() => setShowWithdrawModal(true)} className="text-blue-400 font-bold hover:underline">Rút ngay →</button>
@@ -1327,7 +1459,7 @@
                   </button>
                   <button onClick={() => setCurrentTab('shopee_hub')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'shopee_hub' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                     <i className="fa-solid fa-bolt text-blue-500 w-4"></i> Flash Sale
-                    <span className="ml-auto text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-bold">30%</span>
+                    <span className="ml-auto text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-bold">55%</span>
                   </button>
                   <button onClick={() => setCurrentTab('accesstrade_hub')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'accesstrade_hub' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                     <i className="fa-solid fa-coins text-indigo-600 w-4"></i> Nhiệm Vụ
@@ -1339,6 +1471,10 @@
                   </button>
                   <button onClick={() => setCurrentTab('vi_tien')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'vi_tien' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                     <i className="fa-solid fa-wallet text-blue-500 w-4"></i> Ví của tôi & Rút tiền
+                  </button>
+                  <button onClick={() => setCurrentTab('bang_xep_hang')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-left ${currentTab === 'bang_xep_hang' ? 'bg-amber-50 text-amber-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
+                    <i className="fa-solid fa-trophy text-amber-500 w-4"></i> Bảng Xếp Hạng
+                    <span className="ml-auto text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-black">TOP</span>
                   </button>
 
                   {currentUser.role === 'ADMIN' && (
@@ -1354,7 +1490,7 @@
               </div>
 
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl text-center">
-                <p className="text-xs font-bold text-slate-700">🔒 Hoàn 30% • Giới thiệu 10%</p>
+                <p className="text-xs font-bold text-slate-700">🔒 Hoàn 40-55% • Giới thiệu 10%</p>
                 <p className="text-[11px] text-slate-400 mt-0.5">Shopee API & Accesstrade Postback</p>
               </div>
             </aside>
@@ -1372,6 +1508,9 @@
                           <span>{currentUser.display_name || currentUser.username}</span>
                           <span>👋</span>
                         </h2>
+                        {wallet && wallet.rank_key && (
+                          <div className="pt-0.5"><RankBadge wallet={wallet} /></div>
+                        )}
                       </div>
                       <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-amber-200 font-bold backdrop-blur-sm">
                         <i className="fa-solid fa-crown text-sm"></i>
@@ -1414,8 +1553,8 @@
                         <div className="flex items-center gap-1 text-blue-200 text-[11px] font-bold mb-1">
                           <i className="fa-solid fa-tag"></i>
                         </div>
-                        <span className="text-xs sm:text-sm font-black block truncate">30% Hoàn</span>
-                        <span className="text-[10px] text-blue-200 font-bold uppercase block mt-0.5">Cơ chế hoàn</span>
+                        <span className="text-xs sm:text-sm font-black block truncate">{wallet && wallet.rank_key ? `${Math.round(wallet.rank_rate * 100)}% Hoàn` : 'Đến 55% Hoàn'}</span>
+                        <span className="text-[10px] text-blue-200 font-bold uppercase block mt-0.5">{wallet && wallet.rank_key ? `Hạng ${wallet.rank_label}` : 'Cơ chế hoàn'}</span>
                       </div>
                     </div>
                   </div>
@@ -1423,7 +1562,7 @@
                   <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 space-y-4">
                     <div className="space-y-1">
                       <h3 className="font-black text-sm sm:text-base text-slate-900">
-                        Dán link Shopee hoặc TikTok — nhận <strong className="text-blue-600">30% hoàn tiền</strong>
+                        Dán link Shopee hoặc TikTok — nhận <strong className="text-blue-600">40-55% hoàn tiền</strong>
                       </h3>
                       <p className="text-xs text-slate-400">Hệ thống bóc tách link thật & tạo Sub-ID gắn với tài khoản của bạn.</p>
                     </div>
@@ -1562,6 +1701,30 @@
                       </div>
                     </div>
                   )}
+
+                  {/* Quick Actions: Tips & Order Claim */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setShowTipsModal(true)}
+                      className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition text-left group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">
+                        <i className="fa-solid fa-lightbulb"></i>
+                      </div>
+                      <h4 className="font-black text-xs text-slate-900">Mẹo Săn Deal</h4>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Hướng dẫn tối ưu hoàn tiền</p>
+                    </button>
+                    <button
+                      onClick={() => setShowOrderClaimModal(true)}
+                      className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition text-left group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">
+                        <i className="fa-solid fa-file-circle-plus"></i>
+                      </div>
+                      <h4 className="font-black text-xs text-slate-900">Khai Báo Đơn</h4>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Gửi đơn thủ công cho admin</p>
+                    </button>
+                  </div>
 
                 </div>
               )}
@@ -2208,6 +2371,104 @@
                 </div>
               )}
 
+              {/* ============ BẢNG XẾP HẠNG (Public) ============ */}
+              {currentTab === 'bang_xep_hang' && (
+                <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
+                  <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                    <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl shadow-lg">
+                        <i className="fa-solid fa-trophy"></i>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-black">BẢNG XẾP HẠNG HOÀN TIỀN</h2>
+                        <p className="text-xs text-amber-100 mt-0.5">Top 15 thành viên có tổng hoàn tiền cao nhất hệ thống</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {leaderboardLoading && !leaderboard && (
+                    <div className="bg-white rounded-3xl p-10 shadow-sm border border-slate-200 flex items-center justify-center text-slate-400 text-sm">
+                      <i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang tải bảng xếp hạng...
+                    </div>
+                  )}
+
+                  {leaderboard && (
+                    <div className="space-y-4">
+                      {/* Current user rank card */}
+                      {leaderboard.current_user_rank && (
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 text-white shadow-lg flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg">
+                              #{leaderboard.current_user_rank}
+                            </div>
+                            <div>
+                              <span className="text-xs text-blue-200 font-bold">Vị trí của bạn</span>
+                              <p className="font-black text-sm">{currentUser.display_name || currentUser.username}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-xs text-blue-200 font-bold block">Tổng hoàn tiền</span>
+                            <span className="font-black text-lg">{leaderboard.current_user_total_cashback_display || '0 đ'}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Leaderboard table */}
+                      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="p-3 text-left font-black text-slate-500 uppercase w-16">Hạng</th>
+                                <th className="p-3 text-left font-black text-slate-500 uppercase">Thành Viên</th>
+                                <th className="p-3 text-right font-black text-slate-500 uppercase">Đơn Duyệt</th>
+                                <th className="p-3 text-right font-black text-slate-500 uppercase">Tổng Hoàn Tiền</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {leaderboard.leaderboard && leaderboard.leaderboard.map((entry) => {
+                                const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : null;
+                                const isMe = entry.user_id === currentUser.id;
+                                return (
+                                  <tr key={entry.user_id} className={`border-b border-slate-100 ${isMe ? 'bg-blue-50' : 'hover:bg-slate-50'} transition`}>
+                                    <td className="p-3">
+                                      {medal ? (
+                                        <span className="text-xl">{medal}</span>
+                                      ) : (
+                                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 font-black text-slate-600 text-xs">{entry.rank}</span>
+                                      )}
+                                    </td>
+                                    <td className="p-3">
+                                      <div className="flex items-center gap-2">
+                                        <span className={`font-bold text-sm ${isMe ? 'text-blue-600' : 'text-slate-800'}`}>
+                                          {entry.display_name || entry.username}
+                                        </span>
+                                        {isMe && <span className="bg-blue-100 text-blue-600 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">Bạn</span>}
+                                      </div>
+                                    </td>
+                                    <td className="p-3 text-right font-bold text-slate-600">{entry.approved_orders}</td>
+                                    <td className="p-3 text-right font-black text-amber-600 text-sm">{entry.total_cashback_display}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                        {leaderboard.leaderboard && leaderboard.leaderboard.length === 0 && (
+                          <div className="p-8 text-center text-slate-400 text-sm">Chưa có dữ liệu xếp hạng.</div>
+                        )}
+                      </div>
+
+                      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                        <p className="text-xs text-amber-700 font-bold">Mua sắm qua PaybackGo nhiều hơn để leo hạng và nhận tỷ lệ hoàn tiền cao hơn!</p>
+                        <p className="text-[10px] text-amber-500 mt-1">Bạc 40% → Vàng 45% (20+ đơn) → Kim Cương 55% (50+ đơn)</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {currentTab === 'admin_portal' && currentUser.role === 'ADMIN' && (
                 <div className="space-y-6 animate-fade-in">
                   <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 border border-blue-500/40 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden">
@@ -2268,6 +2529,215 @@
                     </div>
                   </div>
 
+                  {/* ---- Admin Dashboard KPI & Tools ---- */}
+                  <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                        <i className="fa-solid fa-chart-line text-blue-500"></i> TỔNG QUAN HỆ THỐNG (KPI)
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={GOOGLE_SHEET_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl text-[11px] font-black transition flex items-center gap-1.5 border border-emerald-200"
+                        >
+                          <i className="fa-solid fa-table"></i> Google Sheet Đối Soát
+                        </a>
+                        <a
+                          href={API_BASE + '/api/v1/admin/dashboard/withdrawals/export'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[11px] font-black transition flex items-center gap-1.5"
+                        >
+                          <i className="fa-solid fa-file-csv"></i> Xuất CSV Rút Tiền
+                        </a>
+                      </div>
+                    </div>
+
+                    {dashboardStatsLoading && !dashboardStats && (
+                      <div className="py-4 flex items-center justify-center text-slate-400 text-sm">
+                        <i className="fa-solid fa-spinner fa-spin mr-2"></i> Đang tải KPI...
+                      </div>
+                    )}
+
+                    {dashboardStats && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="bg-blue-50 border border-blue-200 p-3 rounded-2xl">
+                            <span className="text-[10px] text-blue-500 font-bold uppercase block">Tổng Thành Viên</span>
+                            <span className="text-xl font-black text-blue-700">{dashboardStats.total_users}</span>
+                            <span className="text-[10px] text-blue-400 block mt-0.5">Hôm nay: +{dashboardStats.today_new_users}</span>
+                          </div>
+                          <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl">
+                            <span className="text-[10px] text-emerald-500 font-bold uppercase block">Đơn Đã Duyệt</span>
+                            <span className="text-xl font-black text-emerald-700">{dashboardStats.approved_orders}</span>
+                            <span className="text-[10px] text-emerald-400 block mt-0.5">Tổng: {dashboardStats.total_orders} | Chờ: {dashboardStats.pending_orders}</span>
+                          </div>
+                          <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl">
+                            <span className="text-[10px] text-amber-500 font-bold uppercase block">Lợi Nhuận Admin</span>
+                            <span className="text-lg font-black text-amber-700">{dashboardStats.total_admin_profit_display}</span>
+                            <span className="text-[10px] text-amber-400 block mt-0.5">Hoa hồng: {dashboardStats.total_commission_amount_display}</span>
+                          </div>
+                          <div className="bg-rose-50 border border-rose-200 p-3 rounded-2xl">
+                            <span className="text-[10px] text-rose-500 font-bold uppercase block">Rút Tiền Chờ Duyệt</span>
+                            <span className="text-xl font-black text-rose-700">{dashboardStats.total_withdrawals_pending_count}</span>
+                            <span className="text-[10px] text-rose-400 block mt-0.5">{dashboardStats.total_withdrawals_pending_amount_display}</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"><i className="fa-solid fa-check-double"></i></div>
+                            <div>
+                              <span className="text-[10px] text-slate-500 font-bold uppercase block">Đã Giải Ngân</span>
+                              <span className="text-sm font-black text-slate-800">{dashboardStats.total_withdrawals_approved_count} lệnh • {dashboardStats.total_withdrawals_approved_amount_display}</span>
+                            </div>
+                          </div>
+                          <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center"><i className="fa-solid fa-cart-shopping"></i></div>
+                            <div>
+                              <span className="text-[10px] text-slate-500 font-bold uppercase block">Đơn Hôm Nay</span>
+                              <span className="text-sm font-black text-slate-800">{dashboardStats.today_orders} đơn mới | Huỷ: {dashboardStats.cancelled_orders}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ---- Admin Dashboard Tabs: Fraud / Withdrawals / BXH ---- */}
+                  <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div className="flex items-center gap-1.5 text-xs font-bold bg-slate-100 p-1 rounded-xl">
+                      <button onClick={() => setAdminDashTab('overview')} className={`px-3 py-1.5 rounded-lg transition ${adminDashTab === 'overview' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>
+                        <i className="fa-solid fa-list-check mr-1"></i> Đối Soát Đơn
+                      </button>
+                      <button onClick={() => { setAdminDashTab('fraud'); if (!fraudAlerts) loadFraudAlerts(); }} className={`px-3 py-1.5 rounded-lg transition ${adminDashTab === 'fraud' ? 'bg-white text-rose-600 shadow' : 'text-slate-600'}`}>
+                        <i className="fa-solid fa-shield-halved mr-1"></i> Gian Lận ({fraudAlerts ? fraudAlerts.total : '...'})
+                      </button>
+                      <button onClick={() => { setAdminDashTab('withdrawals'); if (!pendingWithdrawals) loadPendingWithdrawals(); }} className={`px-3 py-1.5 rounded-lg transition ${adminDashTab === 'withdrawals' ? 'bg-white text-amber-600 shadow' : 'text-slate-600'}`}>
+                        <i className="fa-solid fa-money-bill-transfer mr-1"></i> Rút Tiền Chờ
+                      </button>
+                      <button onClick={() => { setAdminDashTab('bxh'); if (!adminLeaderboard) loadAdminLeaderboard(); }} className={`px-3 py-1.5 rounded-lg transition ${adminDashTab === 'bxh' ? 'bg-white text-amber-600 shadow' : 'text-slate-600'}`}>
+                        <i className="fa-solid fa-trophy mr-1"></i> BXH Admin
+                      </button>
+                    </div>
+
+                    {/* Fraud Alerts Tab */}
+                    {adminDashTab === 'fraud' && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-black text-sm text-slate-900">Cảnh Báo Gian Lận</h4>
+                          <button onClick={loadFraudAlerts} className="text-[11px] text-blue-600 font-bold hover:underline"><i className="fa-solid fa-rotate mr-1"></i>Tải lại</button>
+                        </div>
+                        {fraudAlertsLoading && <div className="py-4 text-center text-slate-400 text-sm"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>}
+                        {fraudAlerts && fraudAlerts.alerts && fraudAlerts.alerts.length === 0 && (
+                          <div className="py-6 text-center text-emerald-500 text-sm font-bold"><i className="fa-solid fa-shield-check mr-1"></i>Không phát hiện dấu hiệu gian lận nào.</div>
+                        )}
+                        {fraudAlerts && fraudAlerts.alerts && fraudAlerts.alerts.map((alert, idx) => {
+                          const severityColors = { high: 'bg-rose-50 border-rose-300 text-rose-800', medium: 'bg-amber-50 border-amber-300 text-amber-800', low: 'bg-sky-50 border-sky-300 text-sky-800' };
+                          const severityBadge = { high: 'bg-rose-600', medium: 'bg-amber-500', low: 'bg-sky-500' };
+                          return (
+                            <div key={idx} className={`p-3.5 rounded-2xl border ${severityColors[alert.severity] || 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className={`${severityBadge[alert.severity] || 'bg-slate-500'} text-white text-[9px] font-black px-2 py-0.5 rounded uppercase`}>{alert.severity}</span>
+                                <span className="text-[10px] font-black uppercase">{alert.alert_type.replace(/_/g, ' ')}</span>
+                              </div>
+                              <p className="text-xs font-semibold">{alert.description}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Pending Withdrawals Tab */}
+                    {adminDashTab === 'withdrawals' && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-black text-sm text-slate-900">Lệnh Rút Tiền Chờ Duyệt</h4>
+                          <button onClick={loadPendingWithdrawals} className="text-[11px] text-blue-600 font-bold hover:underline"><i className="fa-solid fa-rotate mr-1"></i>Tải lại</button>
+                        </div>
+                        {pendingWithdrawalsLoading && <div className="py-4 text-center text-slate-400 text-sm"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>}
+                        {pendingWithdrawals && pendingWithdrawals.length === 0 && (
+                          <div className="py-6 text-center text-emerald-500 text-sm font-bold"><i className="fa-solid fa-check-circle mr-1"></i>Không có lệnh rút tiền nào đang chờ.</div>
+                        )}
+                        {pendingWithdrawals && pendingWithdrawals.length > 0 && (
+                          <div className="space-y-2">
+                            {pendingWithdrawals.map((wd) => (
+                              <div key={wd.id} className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="space-y-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded">CHỜ DUYỆT</span>
+                                    <span className="font-mono text-[11px] text-slate-500">{wd.id}</span>
+                                  </div>
+                                  <p className="text-xs font-bold text-slate-800">{wd.user_email || `User #${wd.user_id}`} • {wd.dest_bank_name} - {wd.dest_account_number} ({wd.dest_account_name})</p>
+                                  <p className="text-lg font-black text-amber-700">{wd.amount_display}</p>
+                                  {wd.pending_reason && <p className="text-[10px] text-amber-600 italic">Lý do chờ: {wd.pending_reason}</p>}
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <button
+                                    onClick={() => handleApproveWithdrawal(wd.id)}
+                                    disabled={approvingWdId === wd.id}
+                                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs transition disabled:opacity-50 flex items-center gap-1"
+                                  >
+                                    {approvingWdId === wd.id ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-check"></i>} Duyệt
+                                  </button>
+                                  <button
+                                    onClick={() => handleRejectWithdrawal(wd.id)}
+                                    disabled={rejectingWdId === wd.id}
+                                    className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-xs transition disabled:opacity-50 flex items-center gap-1"
+                                  >
+                                    {rejectingWdId === wd.id ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-xmark"></i>} Từ chối
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Admin Leaderboard Tab */}
+                    {adminDashTab === 'bxh' && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-black text-sm text-slate-900">Top 20 Hoàn Tiền (Admin View)</h4>
+                          <button onClick={loadAdminLeaderboard} className="text-[11px] text-blue-600 font-bold hover:underline"><i className="fa-solid fa-rotate mr-1"></i>Tải lại</button>
+                        </div>
+                        {adminLeaderboardLoading && <div className="py-4 text-center text-slate-400 text-sm"><i className="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>}
+                        {adminLeaderboard && adminLeaderboard.leaderboard && (
+                          <div className="overflow-x-auto -mx-2">
+                            <table className="w-full text-xs min-w-[500px]">
+                              <thead>
+                                <tr className="bg-slate-50 border-b border-slate-200">
+                                  <th className="p-2.5 text-left font-black text-slate-500">#</th>
+                                  <th className="p-2.5 text-left font-black text-slate-500">User</th>
+                                  <th className="p-2.5 text-left font-black text-slate-500">User ID</th>
+                                  <th className="p-2.5 text-right font-black text-slate-500">Đơn Duyệt</th>
+                                  <th className="p-2.5 text-right font-black text-slate-500">Tổng Cashback</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {adminLeaderboard.leaderboard.map((entry) => (
+                                  <tr key={entry.user_id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                                    <td className="p-2.5 font-black">{entry.rank}</td>
+                                    <td className="p-2.5 font-bold text-slate-800">{entry.display_name}</td>
+                                    <td className="p-2.5 text-slate-500 font-mono">#{entry.user_id}</td>
+                                    <td className="p-2.5 text-right font-bold">{entry.approved_orders}</td>
+                                    <td className="p-2.5 text-right font-black text-amber-600">{entry.total_cashback_display}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ---- Existing Reconciliation Section ---- */}
+                  {adminDashTab === 'overview' && (
+                  <React.Fragment>
                   <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                       <div>
@@ -2695,6 +3165,8 @@
                       </div>
                     )}
                   </div>
+                  </React.Fragment>
+                  )}
 
                 </div>
               )}
@@ -3291,6 +3763,173 @@
                     <button type="submit" disabled={taskFormSubmitting} className="flex-1 py-2.5 gradient-blue text-white rounded-xl font-black shadow transition disabled:opacity-60 flex items-center justify-center gap-2">
                       {taskFormSubmitting && <i className="fa-solid fa-spinner fa-spin"></i>}
                       <span>Lưu thay đổi</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* ============ TIPS & TRICKS MODAL ============ */}
+          {showTipsModal && (
+            <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+              <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 relative max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                      <i className="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <h3 className="font-black text-base text-slate-900">Mẹo Săn Deal & Tối Ưu Hoàn Tiền</h3>
+                  </div>
+                  <button onClick={() => setShowTipsModal(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                    <i className="fa-solid fa-xmark text-lg"></i>
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-2">
+                    <h4 className="font-black text-sm text-blue-800 flex items-center gap-1.5"><i className="fa-solid fa-1 w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px]"></i> Luôn dán link qua PaybackGo</h4>
+                    <p className="text-xs text-blue-700">Mỗi lần mua hàng trên Shopee, hãy dán link sản phẩm vào ô "Bóc tách link" trên trang chủ PaybackGo. Hệ thống sẽ tạo link Sub-ID riêng cho bạn, đảm bảo hoàn tiền được ghi nhận chính xác.</p>
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
+                    <h4 className="font-black text-sm text-emerald-800 flex items-center gap-1.5"><i className="fa-solid fa-2 w-5 h-5 bg-emerald-600 text-white rounded-full flex items-center justify-center text-[10px]"></i> Mua nhiều để lên hạng</h4>
+                    <p className="text-xs text-emerald-700">Bạc (40%) → Vàng (45%, 20+ đơn duyệt) → Kim Cương (55%, 50+ đơn duyệt). Càng mua nhiều qua PaybackGo, tỷ lệ hoàn tiền càng cao!</p>
+                  </div>
+
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-2">
+                    <h4 className="font-black text-sm text-amber-800 flex items-center gap-1.5"><i className="fa-solid fa-3 w-5 h-5 bg-amber-600 text-white rounded-full flex items-center justify-center text-[10px]"></i> Giới thiệu bạn bè nhận 10% vĩnh viễn</h4>
+                    <p className="text-xs text-amber-700">Chia sẻ mã giới thiệu cho bạn bè. Bạn nhận 10% hoa hồng từ MỌI đơn hàng của người được giới thiệu — không giới hạn thời gian.</p>
+                  </div>
+
+                  <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 space-y-2">
+                    <h4 className="font-black text-sm text-purple-800 flex items-center gap-1.5"><i className="fa-solid fa-4 w-5 h-5 bg-purple-600 text-white rounded-full flex items-center justify-center text-[10px]"></i> Kiểm tra đơn thường xuyên</h4>
+                    <p className="text-xs text-purple-700">Sau khi mua hàng, hãy theo dõi tab "Ví Của Tôi" để xem trạng thái đơn. Đơn hàng sẽ được admin đối soát và duyệt hoàn tiền trong 1-3 ngày làm việc.</p>
+                  </div>
+
+                  <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-2">
+                    <h4 className="font-black text-sm text-rose-800 flex items-center gap-1.5"><i className="fa-solid fa-5 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px]"></i> Rút tiền nhanh chóng</h4>
+                    <p className="text-xs text-rose-700">Số dư khả dụng từ 10.000đ trở lên có thể rút về ngân hàng bất cứ lúc nào. Lưu sẵn tài khoản ngân hàng để rút nhanh hơn!</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowTipsModal(false)}
+                  className="w-full py-3 gradient-blue text-white font-black rounded-2xl text-sm shadow-lg transition"
+                >
+                  Đã hiểu, đóng
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ============ ORDER CLAIM MODAL ============ */}
+          {showOrderClaimModal && (
+            <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+              <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 relative max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                      <i className="fa-solid fa-file-circle-plus"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-black text-base text-slate-900">Khai Báo Đơn Hàng Thủ Công</h3>
+                      <p className="text-[10px] text-slate-400">Gửi thông tin đơn để Admin xác nhận hoàn tiền</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setShowOrderClaimModal(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                    <i className="fa-solid fa-xmark text-lg"></i>
+                  </button>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  <p className="text-xs text-amber-700 font-semibold"><i className="fa-solid fa-circle-info mr-1"></i> Nếu bạn đã mua hàng qua link PaybackGo nhưng đơn chưa hiển thị, hãy khai báo tại đây. Admin sẽ kiểm tra và xác nhận cho bạn.</p>
+                </div>
+
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setOrderClaimSubmitting(true);
+                    try {
+                      await apiFetch('/api/v1/affiliate/claim-order', {
+                        method: 'POST',
+                        body: orderClaimForm,
+                      });
+                      showToast('Đã gửi khai báo đơn thành công! Admin sẽ kiểm tra.');
+                      setShowOrderClaimModal(false);
+                      setOrderClaimForm({ order_code: '', platform: 'shopee', screenshot_url: '', note: '' });
+                    } catch (err) {
+                      showToast(err.message || 'Gửi khai báo thất bại.');
+                    } finally {
+                      setOrderClaimSubmitting(false);
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Mã đơn hàng *</label>
+                    <input
+                      type="text"
+                      required
+                      value={orderClaimForm.order_code}
+                      onChange={(e) => setOrderClaimForm({ ...orderClaimForm, order_code: e.target.value })}
+                      placeholder="VD: 241201ABCDEF hoặc link đơn"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Nền tảng *</label>
+                    <select
+                      value={orderClaimForm.platform}
+                      onChange={(e) => setOrderClaimForm({ ...orderClaimForm, platform: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="shopee">Shopee</option>
+                      <option value="tiktok">TikTok Shop</option>
+                      <option value="lazada">Lazada</option>
+                      <option value="accesstrade">Accesstrade</option>
+                      <option value="other">Khác</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Link ảnh chụp đơn (tùy chọn)</label>
+                    <input
+                      type="text"
+                      value={orderClaimForm.screenshot_url}
+                      onChange={(e) => setOrderClaimForm({ ...orderClaimForm, screenshot_url: e.target.value })}
+                      placeholder="Dán link ảnh đơn hàng từ Imgur, Google Photos..."
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Ghi chú (tùy chọn)</label>
+                    <textarea
+                      value={orderClaimForm.note}
+                      onChange={(e) => setOrderClaimForm({ ...orderClaimForm, note: e.target.value })}
+                      placeholder="Thông tin thêm (giá trị đơn, ngày mua...)"
+                      rows={3}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-500 resize-none"
+                    ></textarea>
+                  </div>
+
+                  <div className="flex gap-2 pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowOrderClaimModal(false)}
+                      className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition"
+                    >
+                      Huỷ
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={orderClaimSubmitting}
+                      className="flex-1 py-2.5 gradient-blue text-white rounded-xl font-black text-sm shadow-lg transition disabled:opacity-60 flex items-center justify-center gap-2"
+                    >
+                      {orderClaimSubmitting && <i className="fa-solid fa-spinner fa-spin"></i>}
+                      <span>Gửi Khai Báo</span>
                     </button>
                   </div>
                 </form>
