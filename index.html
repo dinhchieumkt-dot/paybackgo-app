@@ -448,8 +448,9 @@
             method: 'POST',
             body: { username: authForm.username.trim(), password: authForm.password, device_token: getDeviceToken() },
           });
-          setSession(data.access_token, data.user);
-          setCurrentUser(data.user);
+          const userObj = { id: data.user_id, username: data.username, role: data.role, referral_code: data.referral_code };
+          setSession(data.access_token, userObj);
+          setCurrentUser(userObj);
           setAuthForm({ username: '', password: '', confirm_password: '', referral_code: '' });
           showToast('Đăng nhập thành công!');
         } catch (err) {
@@ -470,8 +471,9 @@
             method: 'POST',
             body: { username: authForm.username.trim(), password: authForm.password, device_token: getDeviceToken() },
           });
-          setSession(data.access_token, data.user);
-          setCurrentUser(data.user);
+          const userObj = { id: data.user_id, username: data.username, role: data.role, referral_code: data.referral_code };
+          setSession(data.access_token, userObj);
+          setCurrentUser(userObj);
           setAuthForm({ username: '', password: '', confirm_password: '', referral_code: '' });
           showToast('Đăng ký & đăng nhập thành công!');
         } catch (err) {
