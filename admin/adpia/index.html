@@ -11,13 +11,20 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180x180.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/assets/index-CwhEHzbg.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DWMxU6_w.css">
+    <link rel="preconnect" href="https://paybackgo.store" crossorigin />
+    <link rel="preload" href="/fonts/pjs-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/pjs-vietnamese.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/icons/logo-96.webp" as="image" type="image/webp" />
+    <style>
+      html,body{margin:0;background:#FFF6F3}
+      #splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#FFF6F3}
+      #splash img{width:72px;height:72px;border-radius:18px;animation:pbgpulse 1.2s ease-in-out infinite}
+      @keyframes pbgpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.94)}}
+    </style>
+    <script type="module" crossorigin src="/assets/index-B4i1DWfU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CSJAqVwj.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div id="splash"><img src="/icons/logo-96.webp" alt="" width="72" height="72" /></div></div>
   </body>
 </html>

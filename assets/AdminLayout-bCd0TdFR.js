@@ -1,0 +1,65 @@
+import{c as t,u as g,r as y,a as f,j as e,N as j,U as k,L as N,S as v,T as w,X as x,b as l,d as M,C as _,e as p,O as z}from"./index-B4i1DWfU.js";/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const A=[["path",{d:"m16 3 4 4-4 4",key:"1x1c3m"}],["path",{d:"M20 7H4",key:"zbl0bi"}],["path",{d:"m8 21-4-4 4-4",key:"h9nckh"}],["path",{d:"M4 17h16",key:"g4d7ey"}]],C=t("arrow-right-left",A);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const $=[["path",{d:"M10.268 21a2 2 0 0 0 3.464 0",key:"vwvbt9"}],["path",{d:"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326",key:"11g9vi"}]],L=t("bell",$);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const S=[["path",{d:"M12 7v14",key:"1akyts"}],["path",{d:"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z",key:"ruj8y"}]],T=t("book-open",S);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const q=[["path",{d:"M15 3h6v6",key:"1q9fwt"}],["path",{d:"M10 14 21 3",key:"gplh6r"}],["path",{d:"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6",key:"a6xqqp"}]],m=t("external-link",q);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const H=[["rect",{width:"7",height:"9",x:"3",y:"3",rx:"1",key:"10lvy0"}],["rect",{width:"7",height:"5",x:"14",y:"3",rx:"1",key:"16une8"}],["rect",{width:"7",height:"9",x:"14",y:"12",rx:"1",key:"1hutg5"}],["rect",{width:"7",height:"5",x:"3",y:"16",rx:"1",key:"ldoo1y"}]],V=t("layout-dashboard",H);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const O=[["path",{d:"M4 5h16",key:"1tepv9"}],["path",{d:"M4 12h16",key:"1lakjw"}],["path",{d:"M4 19h16",key:"1djgab"}]],D=t("menu",O);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const E=[["path",{d:"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z",key:"1a0edw"}],["path",{d:"M12 22V12",key:"d0xqtd"}],["polyline",{points:"3.29 7 12 12 20.71 7",key:"ousv84"}],["path",{d:"m7.5 4.27 9 5.15",key:"1c824w"}]],B=t("package",E);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const F=[["path",{d:"m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z",key:"7g6ntu"}],["path",{d:"m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z",key:"ijws7r"}],["path",{d:"M7 21h10",key:"1b0cd5"}],["path",{d:"M12 3v18",key:"108xh3"}],["path",{d:"M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2",key:"3gwbw2"}]],G=t("scale",F);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const P=[["path",{d:"M15 12h-5",key:"r7krc0"}],["path",{d:"M15 8h-5",key:"1khuty"}],["path",{d:"M19 17V5a2 2 0 0 0-2-2H4",key:"zz82l3"}],["path",{d:"M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3",key:"1ph1d7"}]],I=t("scroll-text",P);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const K=[["path",{d:"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915",key:"1i5ecw"}],["circle",{cx:"12",cy:"12",r:"3",key:"1v7zrd"}]],Q=t("settings",K);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const R=[["rect",{width:"14",height:"20",x:"5",y:"2",rx:"2",ry:"2",key:"1yt0o3"}],["path",{d:"M12 18h.01",key:"mhygvu"}]],i=t("smartphone",R);/**
+ * @license lucide-react v0.546.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const U=[["path",{d:"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z",key:"1s2grr"}],["path",{d:"M20 2v4",key:"1rf3ol"}],["path",{d:"M22 4h-4",key:"gwowj6"}],["circle",{cx:"4",cy:"20",r:"2",key:"6kqj1y"}]],W=t("sparkles",U),r=[{path:"/admin",label:"Tổng quan",icon:V,exact:!0},{path:"/admin/reconciliation",label:"Đối soát & Đơn hàng",icon:G},{path:"/admin/withdrawals",label:"Rút tiền",icon:C},{path:"/admin/ledger",label:"Sổ cái ví",icon:T},{path:"/admin/users",label:"Người dùng",icon:k},{path:"/admin/support",label:"Hỗ trợ & Khiếu nại",icon:N},{path:"/admin/fraud",label:"Cảnh báo gian lận",icon:v},{path:"/admin/products",label:"Sản phẩm Shopee Hub",icon:B},{path:"/admin/vouchers",label:"Voucher & Ưu đãi",icon:w},{path:"/admin/adpia",label:"Tích hợp ADPIA",icon:W},{path:"/admin/telegram",label:"Telegram & Thông báo",icon:L},{path:"/admin/audit",label:"Nhật ký hệ thống",icon:I},{path:"/admin/settings",label:"Cài đặt hệ thống",icon:Q}],Z=()=>{const{user:a,isLoading:b,logout:c}=g(),[n,o]=y.useState(!1),d=f();if(b)return e.jsx("div",{className:"min-h-screen flex items-center justify-center bg-stone-100 text-stone-700 font-medium",children:"Đang tải Trung tâm Quản trị..."});if(!a||a.role!=="ADMIN")return e.jsx(j,{to:a?"/app":"/auth",replace:!0});const h=r.find(s=>s.exact?d.pathname===s.path:d.pathname.startsWith(s.path))||r[0];return e.jsxs("div",{className:"admin-layout-root h-screen flex flex-col md:flex-row bg-[#F8F9FA] text-stone-800 font-sans overflow-hidden",children:[e.jsxs("header",{className:"md:hidden bg-stone-950 text-white px-4 py-3 flex items-center justify-between border-b border-stone-800 z-30 shrink-0 shadow-md",children:[e.jsxs("div",{className:"flex items-center gap-3",children:[e.jsx("button",{onClick:()=>o(!n),className:"w-10 h-10 rounded-xl bg-stone-900 border border-stone-800 flex items-center justify-center text-white active:scale-95 transition-all","aria-label":"Mở menu quản trị",children:n?e.jsx(x,{size:20}):e.jsx(D,{size:20})}),e.jsxs("div",{children:[e.jsx("span",{className:"text-[10px] uppercase font-black tracking-wider text-[#EA580C] block",children:"PaybackGo Admin"}),e.jsx("h1",{className:"text-sm font-bold text-white truncate max-w-[170px]",children:h.label})]})]}),e.jsxs(l,{to:"/app",state:{preview:!0},className:"flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition-all shadow-sm active:scale-95",title:"Chuyển sang Giao diện Người dùng",children:[e.jsx(i,{size:14}),e.jsx("span",{children:"App User"})]})]}),n&&e.jsx("div",{className:"fixed inset-0 bg-stone-950/70 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200",onClick:()=>o(!1)}),e.jsxs("aside",{className:`
+        fixed inset-y-0 left-0 z-50 w-72 bg-stone-950 text-stone-300 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out
+        md:static md:w-64 lg:w-72 md:translate-x-0 shrink-0 border-r border-stone-900
+        ${n?"translate-x-0":"-translate-x-full"}
+      `,children:[e.jsxs("div",{className:"p-5 border-b border-stone-800/80 flex items-center justify-between",children:[e.jsxs("div",{className:"flex items-center gap-3",children:[e.jsx("img",{src:"/icons/logo-192.webp",alt:"PaybackGo",className:"w-11 h-11 rounded-xl shadow-lg shadow-orange-900/40"}),e.jsxs("div",{children:[e.jsx("h2",{className:"text-base font-black text-white tracking-tight leading-tight",children:"PAYBACKGO"}),e.jsx("p",{className:"text-[10px] font-bold text-orange-400 uppercase tracking-wider",children:"Trung Tâm Quản Trị"})]})]}),e.jsx("button",{onClick:()=>o(!1),className:"md:hidden p-2 text-stone-400 hover:text-white rounded-lg",children:e.jsx(x,{size:20})})]}),e.jsxs("div",{className:"px-5 py-3.5 bg-stone-900/60 border-b border-stone-800/80 flex items-center justify-between",children:[e.jsxs("div",{className:"truncate",children:[e.jsx("p",{className:"text-xs font-bold text-white truncate",children:a.name||"Quản trị viên"}),e.jsx("p",{className:"text-[10px] text-stone-400 truncate",children:a.email})]}),e.jsx("span",{className:"px-2 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",children:a.role})]}),e.jsx("nav",{className:"flex-1 overflow-y-auto py-3 px-3 space-y-1 custom-scrollbar",children:r.map(s=>e.jsxs(M,{to:s.path,end:s.exact,onClick:()=>o(!1),className:({isActive:u})=>`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${u?"bg-[#D03F15] text-white shadow-md shadow-orange-950/40":"text-stone-300 hover:bg-stone-900 hover:text-white"}`,children:[e.jsxs("div",{className:"flex items-center gap-3",children:[e.jsx(s.icon,{size:18,strokeWidth:2,className:"shrink-0"}),e.jsx("span",{className:"truncate",children:s.label})]}),e.jsx(_,{size:14,className:"opacity-40"})]},s.path))}),e.jsxs("div",{className:"p-3.5 border-t border-stone-800/90 space-y-2 bg-stone-950",children:[e.jsxs(l,{to:"/app",state:{preview:!0},className:"w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-stone-900 hover:bg-stone-800 text-stone-200 transition-all border border-stone-800",children:[e.jsx(i,{size:16,className:"text-[#EA580C]"}),e.jsx("span",{children:"Mở Giao Diện Khách Hàng"}),e.jsx(m,{size:12,className:"text-stone-500"})]}),e.jsxs("button",{onClick:c,className:"w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-all",children:[e.jsx(p,{size:16}),e.jsx("span",{children:"Đăng xuất Quản trị"})]})]})]}),e.jsxs("div",{className:"flex-1 flex flex-col h-full overflow-hidden",children:[e.jsxs("div",{className:"hidden md:flex bg-white border-b border-stone-200 px-8 py-3.5 items-center justify-between z-10 shrink-0",children:[e.jsxs("div",{className:"flex items-center gap-2",children:[e.jsx("span",{className:"text-xs text-stone-400 font-medium",children:"Bảng quản trị"}),e.jsx("span",{className:"text-stone-300",children:"/"}),e.jsx("span",{className:"text-xs font-bold text-stone-800",children:h.label})]}),e.jsxs("div",{className:"flex items-center gap-3",children:[e.jsxs(l,{to:"/app",state:{preview:!0},className:"flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#D03F15] text-xs font-bold transition-all border border-orange-200",children:[e.jsx(i,{size:15}),e.jsx("span",{children:"Xem App Khách Hàng"}),e.jsx(m,{size:13})]}),e.jsx("div",{className:"h-4 w-px bg-stone-200 mx-1"}),e.jsxs("button",{onClick:c,className:"text-xs font-semibold text-stone-500 hover:text-rose-600 transition-colors flex items-center gap-1.5",children:[e.jsx(p,{size:14}),e.jsx("span",{children:"Đăng xuất"})]})]})]}),e.jsx("main",{className:"flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative custom-scrollbar",children:e.jsx("div",{className:"max-w-7xl mx-auto pb-12",children:e.jsx(z,{})})})]})]})};export{Z as AdminLayout};
